@@ -1,18 +1,24 @@
+import webgpuContext from "./gpu/WebGPUContext";
+import Quad from "./objects/quad";
 import Renderer from "./Renderer";
 import Scene from "./Scene";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 canvas.width = 900;
-canvas.height = 600;
+canvas.height = 900;
 
-const renderer = new Renderer(canvas);
-await renderer.init();
+await webgpuContext.init(canvas);
+const renderer = new Renderer();
+renderer.init();
 
-const scene = new Scene(renderer);
+const scene = new Scene();
+const quad = new Quad();
 
-function render() {
+scene.add(quad);
+
+const render = () => {
   renderer.render(scene);
   requestAnimationFrame(render);
-}
+};
 
 render();

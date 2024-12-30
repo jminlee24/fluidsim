@@ -3,6 +3,7 @@ interface RenderObject {
   indices?: Int16Array;
   vertexCount: number;
   pipeline: GPURenderPipeline;
+  vertexBuffer: GPUBuffer;
   init: (device: GPUDevice, presentationFormat: GPUTextureFormat) => void;
 }
 

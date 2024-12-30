@@ -1,21 +1,22 @@
-import vert from "../shaders/triangle.vert.wgsl?raw";
-import frag from "../shaders/triangle.frag.wgsl?raw";
+import vert from "../shaders/quad.vert.wgsl?raw";
+import frag from "../shaders/quad.frag.wgsl?raw";
 import RenderObject from "./renderObject";
 
-class Triangle implements RenderObject {
+class Quad implements RenderObject {
   public pipeline!: GPURenderPipeline;
   public vertexCount: number = 6;
   public vertices: Float32Array;
+  public vertexBuffer!: GPUBuffer;
 
   public constructor() {
     // prettier-ignore
     this.vertices = new Float32Array([
-      -1, -1, 
-      -1,  1,
-       1,  1,
-       1,  1,
-       1, -1,
-       -1, 1,
+      -1,  -1, 
+      -1,   1,
+       1,   1,
+       1,   1,
+       1,  -1,
+       -1, -1,
     ]);
   }
 
@@ -26,6 +27,12 @@ class Triangle implements RenderObject {
         module: device.createShaderModule({
           code: vert,
         }),
+        buffers: [
+          {
+            arrayStride: 2 * 4,
+            attributes: [{ shaderLocation: 0, offset: 0, format: "float32x2" }],
+          },
+        ],
       },
       fragment: {
         module: device.createShaderModule({
@@ -34,7 +41,14 @@ class Triangle implements RenderObject {
         targets: [{ format: presentationFormat }],
       },
     });
+
+    this.vertexBuffer = device.createBuffer({
+      size: this.vertices.byteLength,
+      usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
+    });
+
+    device.queue.writeBuffer(this.vertexBuffer, 0, this.vertices);
   }
 }
 
-export default Triangle;
+export default Quad;

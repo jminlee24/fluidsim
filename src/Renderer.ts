@@ -1,24 +1,17 @@
+import webgpuContext from "./gpu/WebGPUContext";
 import Scene from "./Scene";
 
 class Renderer {
-  public device!: GPUDevice;
-  public canvas!: HTMLCanvasElement;
-  public ctx!: GPUCanvasContext;
-  private presentationFormat!: GPUTextureFormat;
+  public ctx = webgpuContext;
   private renderPassDescriptor!: GPURenderPassDescriptor;
 
-  public constructor(canvas: HTMLCanvasElement) {
-    this.canvas = canvas;
-  }
+  public constructor() {}
 
   public async init() {
-    await this.getDevice();
-    await this.getContext();
-
     this.renderPassDescriptor = {
       colorAttachments: [
         {
-          view: this.ctx.getCurrentTexture().createView(),
+          view: this.ctx.context.getCurrentTexture().createView(),
           clearValue: [0.3, 0.3, 0.3, 1],
           loadOp: "clear",
           storeOp: "store",
@@ -27,45 +20,30 @@ class Renderer {
     };
   }
 
-  private async getDevice() {
-    const adapter = await navigator.gpu?.requestAdapter();
-    const device = await adapter?.requestDevice();
-
-    if (!device) {
-      console.error("browser does not support webgpu");
-      return;
-    }
-
-    this.device = device;
-  }
-
-  private async getContext() {
-    this.ctx = this.canvas.getContext("webgpu")!;
-    this.presentationFormat = navigator.gpu.getPreferredCanvasFormat();
-    this.ctx.configure({
-      device: this.device,
-      format: this.presentationFormat,
-    });
-  }
-
   public render(scene: Scene) {
     (
       this.renderPassDescriptor
         .colorAttachments as GPURenderPassColorAttachment[]
-    )[0].view = this.ctx.getCurrentTexture().createView();
-    const encoder = this.device.createCommandEncoder();
+    )[0].view = this.ctx.context.getCurrentTexture().createView();
+    const encoder = this.ctx.device.createCommandEncoder();
 
     const pass = encoder.beginRenderPass(this.renderPassDescriptor);
 
     for (const object of scene.objects) {
+      this.ctx.device.queue.writeBuffer(
+        object.vertexBuffer,
+        0,
+        object.vertices,
+      );
       pass.setPipeline(object.pipeline);
+      pass.setVertexBuffer(0, object.vertexBuffer);
       pass.draw(object.vertexCount);
     }
 
     pass.end();
 
     const commandBuffer = encoder.finish();
-    this.device.queue.submit([commandBuffer]);
+    this.ctx.device.queue.submit([commandBuffer]);
   }
 }
 

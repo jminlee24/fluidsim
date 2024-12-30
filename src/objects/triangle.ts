@@ -6,7 +6,7 @@ class Triangle implements RenderObject {
   public pipeline!: GPURenderPipeline;
   public vertexCount: number = 3;
   public vertices: Float32Array;
-
+  public vertexBuffer!: GPUBuffer;
   public constructor() {
     this.vertices = new Float32Array([0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1]);
   }

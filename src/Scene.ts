@@ -1,14 +1,14 @@
+import webgpuContext from "./gpu/WebGPUContext";
 import RenderObject from "./objects/renderObject";
-import Renderer from "./Renderer";
 
 class Scene {
   public objects: RenderObject[] = [];
   private device: GPUDevice;
   private ctx: GPUCanvasContext;
 
-  public constructor(renderer: Renderer) {
-    this.device = renderer.device;
-    this.ctx = renderer.ctx;
+  public constructor() {
+    this.device = webgpuContext.device;
+    this.ctx = webgpuContext.context;
   }
 
   public add(obj: RenderObject) {
