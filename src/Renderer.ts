@@ -25,19 +25,12 @@ class Renderer {
       this.renderPassDescriptor
         .colorAttachments as GPURenderPassColorAttachment[]
     )[0].view = this.ctx.context.getCurrentTexture().createView();
-    const encoder = this.ctx.device.createCommandEncoder();
 
+    const encoder = this.ctx.device.createCommandEncoder();
     const pass = encoder.beginRenderPass(this.renderPassDescriptor);
 
     for (const object of scene.objects) {
-      this.ctx.device.queue.writeBuffer(
-        object.vertexBuffer,
-        0,
-        object.vertices,
-      );
-      pass.setPipeline(object.pipeline);
-      pass.setVertexBuffer(0, object.vertexBuffer);
-      pass.draw(object.vertexCount);
+      object.draw(this.ctx.device, pass);
     }
 
     pass.end();

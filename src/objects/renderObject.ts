@@ -5,6 +5,7 @@ interface RenderObject {
   pipeline: GPURenderPipeline;
   vertexBuffer: GPUBuffer;
   init: (device: GPUDevice, presentationFormat: GPUTextureFormat) => void;
+  draw: (device: GPUDevice, passEncoder: GPURenderPassEncoder) => void;
 }
 
 export default RenderObject;

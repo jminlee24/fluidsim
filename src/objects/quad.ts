@@ -41,13 +41,18 @@ class Quad implements RenderObject {
         targets: [{ format: presentationFormat }],
       },
     });
+  }
 
+  public draw(device: GPUDevice, passEncoder: GPURenderPassEncoder) {
     this.vertexBuffer = device.createBuffer({
       size: this.vertices.byteLength,
       usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
     });
 
     device.queue.writeBuffer(this.vertexBuffer, 0, this.vertices);
+    passEncoder.setPipeline(this.pipeline);
+    passEncoder.setVertexBuffer(0, this.vertexBuffer);
+    passEncoder.draw(this.vertexCount);
   }
 }
 
