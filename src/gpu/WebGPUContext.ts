@@ -8,7 +8,6 @@ class Context {
   public aspect!: number;
 
   public async init(canvas?: HTMLCanvasElement) {
-    console.log("I am being initalized");
     const adapter = await navigator.gpu?.requestAdapter();
     const device = await adapter?.requestDevice();
     if (!device) {
